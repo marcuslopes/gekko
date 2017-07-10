@@ -16,6 +16,7 @@ var config = require('../core/util.js').getConfig();
 var macdSettings = config.MACD;
 var rsiSettings = config.RSI;
 var uoSettings = config.UO;
+var tsiSettings = config.TSI;
 
 // let's create our own method
 var method = {};
@@ -42,6 +43,7 @@ method.init = function() {
   this.addIndicator('macd', 'MACD', macdSettings);
   this.addIndicator('rsi', 'RSI', rsiSettings);
   this.addIndicator('uo', 'UO', uoSettings);
+  this.addIndicator('tsi', 'TSI', tsiSettings);
 }
 
 // what happens on every new candle?
@@ -56,6 +58,8 @@ method.log = function() {
   var macd = this.indicators.macd;
   var rsi = this.indicators.rsi;
   var uo = this.indicators.uo;
+  var tsi = this.indicators.tsi;
+
 
   var diff = macd.diff;
   var signal = macd.signal.result;
@@ -72,6 +76,9 @@ method.log = function() {
   log.debug('calculated Ultimate Oscillator properties for candle:');
   log.debug('\t', 'UO:', uo.uo.toFixed(digits));
   log.debug('\t', 'price:', candle.close.toFixed(digits));
+  log.debug('calculated TSI properties for candle:');
+  log.debug('\t', 'tsi:', tsi.tsi.toFixed(digits));
+  log.debug('\t', 'price:', candle.close.toFixed(digits));
 }
 
 method.check = function() {
@@ -80,10 +87,13 @@ method.check = function() {
   var rsiVal = rsi.rsi;
   var uo = this.indicators.uo;
   var uoVal = uo.uo;
+  var tsi = this.indicators.tsi;
+  var tsiVal = tsi.tsi;
 
   if(macddiff > macdSettings.thresholds.up && 
     (rsiVal > rsiSettings.thresholds.high ) && 
-    (uoVal > uoSettings.thresholds.high)) {
+    (uoVal > uoSettings.thresholds.high) &&
+    (tsiVal > tsiSettings.thresholds.high)) {
 
     // new trend detected
     if(this.trend.direction !== 'up')
@@ -110,7 +120,8 @@ method.check = function() {
 
   } else if(macddiff < macdSettings.thresholds.down && 
             (rsiVal < rsiSettings.thresholds.low ) &&
-             (uoVal < uoSettings.thresholds.low) ) {
+             (uoVal < uoSettings.thresholds.low) &&
+             (tsiVal < tsiSettings.thresholds.low)) {
 
     // new trend detected
     if(this.trend.direction !== 'down')
